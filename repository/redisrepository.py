@@ -6,17 +6,26 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-#Redis Client
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
-REDIS_DB = int(os.getenv("REDIS_DB", "0"))
+# ==========================================
+# REDIS CLIENT CONFIGURATION
+# ==========================================
+REDIS_URL = os.getenv("REDIS_URL")
 
-redis=Redis(
-    host=REDIS_HOST,
-    port=REDIS_PORT,
-    db=REDIS_DB,
-    decode_responses=True
-)
+if REDIS_URL:
+    # Upstash TLS connection
+    redis = Redis.from_url(REDIS_URL, decode_responses=True)
+else:
+    REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+    REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+    REDIS_DB = int(os.getenv("REDIS_DB", "0"))
+    REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", None)
+    redis = Redis(
+        host=REDIS_HOST,
+        port=REDIS_PORT,
+        db=REDIS_DB,
+        password=REDIS_PASSWORD,
+        decode_responses=True
+    )
 
 #set value
 def set_value(key,value):
