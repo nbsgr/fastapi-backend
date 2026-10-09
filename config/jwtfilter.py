@@ -5,6 +5,7 @@ from manager import jwtmanager as jwt
 
 #public urls
 PUBLIC_URLS = [
+    "/",
     "/docs",
     "/openapi.json",
     "/redoc",
