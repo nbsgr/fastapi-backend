@@ -48,6 +48,15 @@ def health_check():
     except Exception as e:
         results["redis"] = f"ERROR: {str(e)}"
 
+    import os
+    brevo_key = os.getenv("BREVO_API_KEY", "")
+    brevo_sender = os.getenv("BREVO_SENDER_EMAIL", "")
+    results["brevo"] = {
+        "api_key_set": bool(brevo_key),
+        "api_key_len": len(brevo_key),
+        "sender_email": brevo_sender
+    }
+
     return {
         "status": 200,
         "message": "Health Check",
