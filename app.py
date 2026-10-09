@@ -29,6 +29,31 @@ def read_root():
         "data": None
     }
 
+# Diagnostics endpoint to check DB and Redis on Vercel
+@app.get("/api/health-check")
+def health_check():
+    from sqlalchemy import text
+    from repository import redisrepository as rr
+    results = {}
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        results["database"] = "CONNECTED"
+    except Exception as e:
+        results["database"] = f"ERROR: {str(e)}"
+
+    try:
+        rr.redis.ping()
+        results["redis"] = "CONNECTED"
+    except Exception as e:
+        results["redis"] = f"ERROR: {str(e)}"
+
+    return {
+        "status": 200,
+        "message": "Health Check",
+        "data": results
+    }
+
 # Register Routers
 app.include_router(users_router)
 app.include_router(conversations_router)
