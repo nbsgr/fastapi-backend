@@ -43,13 +43,19 @@ def send_email(tomail, subject, message):
         response = requests.post(
             url=BREVO_API_URL,
             json=payload,
-            headers=headers
+            headers=headers,
+            timeout=10
         )
+        print("Brevo Status Code: ", response.status_code)
         print("Brevo Response: ", response.text)
 
-        return response.status_code == 201
+        if response.status_code != 201:
+            print(f"[Brevo Error] Expected 201 but got {response.status_code}: {response.text}")
+            return False
+
+        return True
     except Exception as e:
-        print("Email Exception: ", e)
+        print("[Email Exception]: ", e)
         return False
 
 # ==========================================

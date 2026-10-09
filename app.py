@@ -51,11 +51,29 @@ def health_check():
     import os
     brevo_key = os.getenv("BREVO_API_KEY", "")
     brevo_sender = os.getenv("BREVO_SENDER_EMAIL", "")
-    results["brevo"] = {
-        "api_key_set": bool(brevo_key),
-        "api_key_len": len(brevo_key),
-        "sender_email": brevo_sender
-    }
+    
+    # Test sending email directly to see exact Brevo response
+    from manager import emailmanager as em
+    try:
+        import requests
+        test_payload = {
+            "sender": {"email": brevo_sender},
+            "to": [{"email": brevo_sender}],
+            "subject": "Vercel Diagnostics Test",
+            "textContent": "Testing Brevo from Vercel"
+        }
+        res = requests.post(
+            os.getenv("BREVO_API_URL", "https://api.brevo.com/v3/smtp/email"),
+            json=test_payload,
+            headers={"api-key": brevo_key, "Content-Type": "application/json"},
+            timeout=10
+        )
+        results["brevo"] = {
+            "status_code": res.status_code,
+            "response": res.text
+        }
+    except Exception as e:
+        results["brevo"] = {"error": str(e)}
 
     return {
         "status": 200,
