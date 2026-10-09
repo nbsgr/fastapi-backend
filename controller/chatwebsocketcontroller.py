@@ -43,6 +43,11 @@ async def chat_websocket(
             data = await websocket.receive_json()
             print(f"[WebSocket Received] Payload: {data}")
 
+            # Handle Heartbeat Keep-Alive Ping
+            if data.get("type") == "ping" or data.get("action") == "ping":
+                await websocket.send_json({"type": "pong"})
+                continue
+
             conversation_id = data.get("conversation_id") or data.get("conversationId")
             user_message = data.get("content")
 
