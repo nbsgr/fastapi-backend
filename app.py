@@ -20,6 +20,15 @@ app = FastAPI()
 cors_config(app)
 jwt_filter(app)
 
+# Root endpoint
+@app.get("/")
+def read_root():
+    return {
+        "status": 200,
+        "message": "FastAPI Backend is running successfully!",
+        "data": None
+    }
+
 # Register Routers
 app.include_router(users_router)
 app.include_router(conversations_router)
@@ -31,8 +40,11 @@ from model.user import User
 from model.conversation import Conversation
 from model.chatmessage import ChatMessage
 
-# Create tables
-Base.metadata.create_all(bind=engine)
+# Safely ensure tables exist
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"[Database Init Warning] {e}")
 
 # Start server
 if __name__ == "__main__":
